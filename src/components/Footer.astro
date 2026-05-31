@@ -1,0 +1,84 @@
+---
+/**
+ * Footer - real sitemap (locale-aware via href()) + a language row that
+ * preserves the current page. `de`/`ar` mirror automatically via logical CSS.
+ */
+import { type Locale, type RouteKey, t, LOCALES, LOCALE_NAME, href } from "../i18n/ui";
+export interface Props { lang: Locale; active?: RouteKey }
+const { lang, active = "home" } = Astro.props;
+const s = t(lang);
+const f = s.footer;
+const year = 2026;
+
+const cols: { title: string; items: { label: string; href: string }[] }[] = [
+  {
+    title: f.blurbCols.explore,
+    items: [
+      { label: f.links.destinations, href: href(lang, "destinations") },
+      { label: f.links.experiences, href: href(lang, "experiences") },
+      { label: f.links.halal, href: href(lang, "experiences") + "#halal" },
+      { label: f.links.howItWorks, href: href(lang, "howItWorks") },
+      { label: f.links.trust, href: href(lang, "trust") },
+    ],
+  },
+  {
+    title: f.blurbCols.business,
+    items: [
+      { label: f.links.listBusiness, href: href(lang, "business") },
+      { label: f.links.property, href: href(lang, "property") },
+    ],
+  },
+  {
+    title: f.blurbCols.company,
+    items: [
+      { label: f.links.about, href: href(lang, "about") },
+      { label: f.links.contact, href: href(lang, "about") + "#contact" },
+      { label: f.links.privacy, href: href(lang, "privacy") },
+      { label: f.links.terms, href: href(lang, "terms") },
+    ],
+  },
+];
+---
+<footer style="border-top:1px solid var(--rule);background:var(--bg-3)">
+  <div class="wrap" style="padding-block:48px 28px">
+    <div class="bl-foot" style="display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px">
+      <div>
+        <a href={href(lang, "home")} class="flex items-center gap-2 font-display" style="font-weight:800;font-size:18px;letter-spacing:-0.02em;text-decoration:none;color:var(--ink)">
+          <img src="/brand/icon-cream.svg" alt="" class="bl-logo-on-dark" width="26" height="26" />
+          <img src="/brand/icon-indigo.svg" alt="" class="bl-logo-on-light" width="26" height="26" />
+          Balkan Local
+        </a>
+        <p style="font-size:14px;color:var(--ink-2);margin-top:12px;max-width:34ch">{f.tagline}</p>
+        <p style="font-size:12.5px;color:var(--ink-3);margin-top:16px">{f.madeIn}</p>
+      </div>
+
+      {cols.map((col) => (
+        <div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:10px">{col.title}</div>
+          <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px">
+            {col.items.map((it) => (
+              <li><a href={it.href} class="bl-flink">{it.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <div style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:34px;padding-top:20px;border-top:1px solid var(--rule)">
+      <p style="font-size:12.5px;color:var(--ink-3)">&copy; {year} Balkan Local. {f.rights}</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:12px;color:var(--ink-3)">{f.langLabel}:</span>
+        {LOCALES.map((l) => (
+          <a href={href(l, active)} hreflang={l} class="bl-flink" style={l === lang ? "color:var(--accent);font-weight:700" : ""}>{LOCALE_NAME[l]}</a>
+        ))}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer :global(.bl-flink){font-size:13.5px;color:var(--ink-2);text-decoration:none}
+  footer :global(.bl-flink:hover){color:var(--accent)}
+  @media (max-width: 760px){ footer :global(.bl-foot){grid-template-columns:1fr 1fr !important} }
+  @media (max-width: 460px){ footer :global(.bl-foot){grid-template-columns:1fr !important} }
+</style>

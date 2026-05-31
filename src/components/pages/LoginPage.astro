@@ -1,0 +1,57 @@
+---
+/**
+ * LoginPage - /login. Front-end only: validates, then routes to the dashboard
+ * preview. No backend, nothing is submitted.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import AuthShell from "../AuthShell.astro";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const l = s.login;
+const dashHref = href(lang, "dashboard");
+const signupHref = href(lang, "signup");
+const forgot = href(lang, "login");
+---
+<AuthShell lang={lang} active="login" meta={l.meta}>
+  <h1 class="bl-auth-title">{l.title}</h1>
+  <p class="bl-auth-lead">{l.lead}</p>
+
+  <form id="bl-login-form" novalidate class="bl-auth-form">
+    <label class="bl-auth-label" for="bl-login-email">{l.email}</label>
+    <input id="bl-login-email" name="email" type="email" class="bl-auth-input" required autocomplete="email" />
+
+    <div class="bl-auth-row">
+      <label class="bl-auth-label" for="bl-login-pass">{l.password}</label>
+      <a href={forgot} class="bl-auth-mini">{l.forgot}</a>
+    </div>
+    <input id="bl-login-pass" name="password" type="password" class="bl-auth-input" required autocomplete="current-password" />
+
+    <p class="bl-auth-err" data-err hidden></p>
+    <button type="submit" class="btn bl-auth-submit">{l.submit}</button>
+  </form>
+
+  <p class="bl-auth-switch">{l.noAccount} <a href={signupHref}>{l.switch}</a></p>
+  <p class="bl-auth-note">{l.demoNote}</p>
+</AuthShell>
+
+<!-- Auth-form styles now live in AuthShell (loaded on both /login and /signup). -->
+
+<script is:inline define:vars={{ dashHref, requiredMsg: l.required, emailMsg: l.emailInvalid }}>
+  (function () {
+    var form = document.getElementById("bl-login-form");
+    if (!form) return;
+    var err = form.querySelector("[data-err]");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var fields = form.querySelectorAll("[required]");
+      for (var i = 0; i < fields.length; i++) {
+        var f = fields[i];
+        if (!String(f.value).trim()) { err.textContent = requiredMsg; err.hidden = false; f.focus(); return; }
+        if (f.type === "email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value)) { err.textContent = emailMsg; err.hidden = false; f.focus(); return; }
+      }
+      err.hidden = true;
+      window.location.href = dashHref;
+    });
+  })();
+</script>

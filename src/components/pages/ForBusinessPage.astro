@@ -1,0 +1,29 @@
+---
+/**
+ * ForBusinessPage - /for-business. Founding offer, why-list, vetting, the
+ * dashboard mockup and the multi-step signup form (the existing ForBusiness
+ * section, wholesale), plus a page hero and closing CTA.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+import ForBusiness from "../ForBusiness.astro";
+import CTASection from "../CTASection.astro";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const b = s.business;
+---
+<PageShell lang={lang} active="business" meta={b.meta}>
+  <PageHero title={b.hero.title} lead={b.hero.lead} />
+  <ForBusiness lang={lang} />
+  <CTASection
+    title={b.cta.title}
+    body={b.cta.body}
+    ctaLabel={b.cta.label}
+    ctaHref="#bl-signup"
+    secondaryLabel={s.nav.trust}
+    secondaryHref={href(lang, "trust")}
+  />
+</PageShell>

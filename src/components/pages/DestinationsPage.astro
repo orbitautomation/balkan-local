@@ -1,0 +1,48 @@
+---
+/**
+ * DestinationsPage - /destinations. Bosnia is live (with a city showcase); the
+ * rest of the Balkans is greyed via the shared CountrySelector.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+import CountrySelector from "../CountrySelector.astro";
+import CTASection from "../CTASection.astro";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const d = s.destinations;
+---
+<PageShell lang={lang} active="destinations" meta={d.meta}>
+  <PageHero eyebrow={s.nav.destinations} title={d.hero.title} lead={d.hero.lead} />
+  <CountrySelector lang={lang} />
+
+  <section class="wrap" style="padding-block:56px;border-top:1px solid var(--rule)">
+    <h2 class="section-title reveal">{d.bosniaTitle}</h2>
+    <p class="lead reveal" style="margin-top:8px">{d.bosniaLead}</p>
+    <div class="bl-cities reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px">
+      {d.cities.map((c) => (
+        <div class="card" style="padding:24px">
+          <h3 style="font-size:17px;font-weight:700;display:flex;align-items:center;gap:9px">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none"></span>
+            {c.name}
+          </h3>
+          <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;line-height:1.6">{c.blurb}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <CTASection
+    title={d.cta.title}
+    body={d.cta.body}
+    ctaLabel={d.cta.label}
+    ctaHref={href(lang, "experiences")}
+  />
+</PageShell>
+
+<style>
+  @media (max-width: 860px) { .bl-cities { grid-template-columns: 1fr 1fr !important; } }
+  @media (max-width: 520px) { .bl-cities { grid-template-columns: 1fr !important; } }
+</style>

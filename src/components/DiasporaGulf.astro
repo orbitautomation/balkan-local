@@ -1,0 +1,29 @@
+---
+import { type Locale, t, href } from "../i18n/ui";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+---
+<section class="wrap" style="padding-block:56px;border-top:1px solid var(--rule)">
+  <p class="eyebrow reveal">{s.audience.kicker}</p>
+  <div class="bl-aud reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
+    <div class="card" style="padding:30px;position:relative;overflow:hidden">
+      <div style="position:absolute;inset-inline-end:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:var(--accent-glow);filter:blur(8px)"></div>
+      <div style="font-size:30px">&#127465;&#127466;</div>
+      <h3 style="font-size:22px;font-weight:800;margin-top:12px;letter-spacing:-0.01em">{s.audience.diasporaTitle}</h3>
+      <p style="font-size:14.5px;color:var(--ink-2);margin-top:10px;line-height:1.6;max-width:42ch">{s.audience.diasporaBody}</p>
+      <a href={href(lang, "experiences")} class="btn btn-ghost" style="margin-top:18px">{s.audience.diasporaCta}</a>
+    </div>
+    <div class="card" style="padding:30px;position:relative;overflow:hidden">
+      <div style="position:absolute;inset-inline-end:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:var(--success-soft);filter:blur(8px)"></div>
+      <div style="font-size:30px">&#127765;</div>
+      <h3 style="font-size:22px;font-weight:800;margin-top:12px;letter-spacing:-0.01em">{s.audience.gulfTitle}</h3>
+      <p style="font-size:14.5px;color:var(--ink-2);margin-top:10px;line-height:1.6;max-width:42ch">{s.audience.gulfBody}</p>
+      <a href={href("ar", "experiences")} class="btn btn-ghost" style="margin-top:18px">{s.audience.gulfCta}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width: 760px) { section :global(.bl-aud) { grid-template-columns: 1fr !important; } }
+</style>

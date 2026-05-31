@@ -1,0 +1,24 @@
+---
+import { type Locale, t } from "../i18n/ui";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+---
+<section class="wrap" style="padding-block:56px;border-top:1px solid var(--rule)">
+  <p class="eyebrow reveal">{s.how.kicker}</p>
+  <h2 class="section-title reveal" style="margin-top:10px">{s.how.title}</h2>
+
+  <div class="bl-how reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px">
+    {s.how.steps.map((st) => (
+      <div class="card" style="padding:26px">
+        <div class="font-display" style="width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:18px">{st.n}</div>
+        <h3 style="font-size:17px;font-weight:700;margin-top:14px">{st.t}</h3>
+        <p style="font-size:14px;color:var(--ink-2);margin-top:6px;line-height:1.6">{st.d}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  @media (max-width: 760px) { section :global(.bl-how) { grid-template-columns: 1fr !important; } }
+</style>

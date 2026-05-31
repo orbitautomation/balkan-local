@@ -1,0 +1,58 @@
+---
+/**
+ * Hero - consumer-first home hero. Leads with the tagline and the single
+ * unifying promise (one account, one itinerary, verified throughout) and the
+ * dashboard. Refined verification badges, no emoji. Dual CTA plus a clear
+ * "log in to your dashboard" prompt.
+ */
+import { type Locale, t, href } from "../i18n/ui";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+---
+<section id="hero" class="bl-hero">
+  <div class="wrap" style="padding-block:96px 72px">
+    <p class="eyebrow reveal">{s.hero.eyebrow}</p>
+    <h1 class="font-display reveal bl-hero-title">
+      {s.hero.titleA} <span style="color:var(--accent)">{s.hero.titleHl}.</span>
+    </h1>
+    <p class="lead reveal bl-hero-sub">{s.hero.sub}</p>
+
+    <div class="reveal bl-hero-cta">
+      <a href={href(lang, "destinations")} class="btn">{s.hero.ctaPlan}</a>
+      <a href={href(lang, "howItWorks")} class="btn btn-ghost">{s.hero.ctaHow}</a>
+    </div>
+    <p class="reveal bl-hero-login">
+      {s.hero.loginPrompt} <a href={href(lang, "login")}>{s.hero.loginCta}</a>
+    </p>
+
+    <ul class="reveal bl-hero-badges">
+      {s.hero.badges.map((b) => (
+        <li>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
+          <span>{b}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .bl-hero { position: relative; overflow: hidden; background: var(--hero-grad); }
+  .bl-hero-title {
+    font-size: clamp(38px, 6vw, 66px); line-height: 1.04; letter-spacing: -0.03em;
+    font-weight: 800; max-width: 16ch; margin-top: 18px;
+  }
+  :global(html[lang="de"]) .bl-hero-title { font-size: clamp(30px, 4.8vw, 52px); }
+  .bl-hero-sub { margin-top: 22px; font-size: clamp(16px, 1.9vw, 19px); max-width: 60ch; }
+  .bl-hero-cta { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .bl-hero-login { margin-top: 16px; font-size: 14px; color: var(--ink-3); }
+  .bl-hero-login a { color: var(--accent-2); font-weight: 600; text-decoration: none; }
+  .bl-hero-login a:hover { text-decoration: underline; }
+  .bl-hero-badges {
+    list-style: none; padding: 0; margin: 40px 0 0;
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+  }
+  .bl-hero-badges li { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-2); }
+  .bl-hero-badges svg { color: var(--success); flex: none; }
+</style>

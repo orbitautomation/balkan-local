@@ -1,0 +1,37 @@
+---
+/**
+ * DashboardPage - /dashboard. A front-end preview of the logged-in traveler
+ * dashboard: a welcome header + the existing interactive TripDashboard. Where
+ * the login / signup forms route to. No real auth or data.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import TripDashboard from "../TripDashboard.astro";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const d = s.dashboard;
+---
+<PageShell lang={lang} active="dashboard" meta={d.meta}>
+  <section class="wrap" style="padding-block:48px 8px">
+    <div class="bl-dash-head reveal">
+      <div>
+        <p class="eyebrow">{d.welcome}, {d.sampleName}</p>
+        <h1 class="section-title" style="margin-top:10px">{d.subtitle}</h1>
+      </div>
+      <div class="bl-dash-actions">
+        <a href={href(lang, "destinations")} class="btn">{d.newTrip}</a>
+        <a href={href(lang, "home")} class="btn btn-ghost">{d.logout}</a>
+      </div>
+    </div>
+    <p class="bl-dash-note reveal">{d.previewNote}</p>
+  </section>
+
+  <TripDashboard lang={lang} />
+</PageShell>
+
+<style>
+  .bl-dash-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .bl-dash-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .bl-dash-note { font-size: 13px; color: var(--ink-3); margin-top: 14px; }
+</style>

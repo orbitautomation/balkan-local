@@ -1,0 +1,32 @@
+---
+/**
+ * VerifiedBadge - the teal "Verified by Balkan Local" trust chip. Reused on
+ * Trust, Home and inside the trip dashboard. Label is passed in (localized).
+ */
+export interface Props { label: string; size?: "sm" | "md" }
+const { label, size = "md" } = Astro.props;
+const pad = size === "sm" ? "3px 8px" : "5px 11px";
+const fs = size === "sm" ? "11px" : "12.5px";
+const ic = size === "sm" ? 12 : 14;
+---
+<span class="bl-verified" style={`padding:${pad};font-size:${fs}`}>
+  <svg width={ic} height={ic} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 2l7 3v6c0 4.5-3 8.3-7 9.5C8 19.3 5 15.5 5 11V5l7-3z"></path>
+    <path d="M9 12l2 2 4-4"></path>
+  </svg>
+  <span>{label}</span>
+</span>
+
+<style>
+  .bl-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    border-radius: var(--r-pill);
+    color: var(--success);
+    background: var(--success-soft);
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+    white-space: nowrap;
+  }
+</style>

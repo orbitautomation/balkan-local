@@ -1,0 +1,134 @@
+---
+/**
+ * BaseLayout - HTML shell for every localized page. Sets lang + dir, the
+ * anti-FOUC theme gate, per-page SEO + route-aware hreflang/canonical, and
+ * global behaviour scripts (theme toggle + scroll reveal). Sarajevo Twilight
+ * defaults to dark. Chrome (Nav/Footer) is supplied by PageShell via the slot.
+ */
+import "../styles/tokens.css";
+import "../styles/global.css";
+import { type Locale, type RouteKey, DIR, LOCALES, href, t } from "../i18n/ui";
+
+export interface Props {
+  lang: Locale;
+  active?: RouteKey;
+  meta?: { title: string; description: string };
+}
+const { lang, active = "home", meta } = Astro.props;
+const dir = DIR[lang];
+const s = t(lang);
+
+const title = meta?.title ?? s.meta.title;
+const description = meta?.description ?? s.meta.description;
+
+const base = Astro.site ?? new URL("https://balkanlocal.com");
+const canonical = new URL(href(lang, active), base).href;
+const alternates: { hreflang: string; href: string }[] = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: new URL(href(l, active), base).href })),
+  { hreflang: "x-default", href: new URL(href("en", active), base).href },
+];
+const OG_LOCALE: Record<Locale, string> = { en: "en_US", de: "de_DE", ar: "ar_SA" };
+const ogImage = new URL("/brand/app-tile-512.png", base).href;
+const logoUrl = new URL("/brand/icon-indigo.svg", base).href;
+
+const orgId = new URL("#org", base).href;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": orgId,
+      name: "Balkan Local",
+      url: base.href,
+      logo: logoUrl,
+      slogan: "Experience the Balkans like a local.",
+      description,
+    },
+    {
+      "@type": "WebSite",
+      "@id": new URL("#website", base).href,
+      url: base.href,
+      name: "Balkan Local",
+      inLanguage: lang,
+      publisher: { "@id": orgId },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/brand/app-tile-512.png" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#1E1B4B" />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Balkan Local" />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+
+    <link rel="preload" href="/fonts/general-sans-var.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Anti-FOUC theme gate: Sarajevo Twilight defaults to dark. -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem("balkanlocal.theme");
+          if (t !== "light" && t !== "dark") t = "dark";
+          document.documentElement.dataset.theme = t;
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute("content", t === "dark" ? "#1E1B4B" : "#FAF6EF");
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only" style="position:absolute;z-index:99;padding:10px 16px;background:var(--accent);color:var(--accent-ink);border-radius:0 0 12px 0;">{s.nav.skip}</a>
+    <slot />
+
+    <!-- Theme toggle + scroll reveal (tiny, dependency-free) -->
+    <script is:inline>
+      (function () {
+        // Theme toggle
+        document.addEventListener("click", function (e) {
+          var btn = e.target && e.target.closest && e.target.closest("[data-theme-toggle]");
+          if (!btn) return;
+          var cur = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+          var next = cur === "dark" ? "light" : "dark";
+          document.documentElement.dataset.theme = next;
+          try { localStorage.setItem("balkanlocal.theme", next); } catch (e) {}
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute("content", next === "dark" ? "#1E1B4B" : "#FAF6EF");
+        });
+        // Scroll reveal
+        var els = document.querySelectorAll(".reveal");
+        if (!("IntersectionObserver" in window) || !els.length) {
+          els.forEach(function (el) { el.classList.add("in"); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+          });
+        }, { threshold: 0.12 });
+        els.forEach(function (el) { io.observe(el); });
+      })();
+    </script>
+  </body>
+</html>

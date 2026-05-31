@@ -1,0 +1,28 @@
+---
+/**
+ * LegalPage - renders a simple legal document (privacy or terms) from the
+ * i18n tree. `doc` picks which one; `active` drives the nav/footer state.
+ */
+import { type Locale, type RouteKey, t } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+
+export interface Props { lang: Locale; doc: "privacy" | "terms" }
+const { lang, doc } = Astro.props;
+const s = t(lang);
+const d = s.legal[doc];
+const active: RouteKey = doc;
+---
+<PageShell lang={lang} active={active} meta={d.meta}>
+  <PageHero title={d.title} lead={s.legal.updated} />
+  <section class="wrap" style="padding-block:32px 64px">
+    <div class="reveal" style="max-width:760px;display:flex;flex-direction:column;gap:28px">
+      {d.sections.map((sec) => (
+        <div>
+          <h2 style="font-size:18px;font-weight:800">{sec.h}</h2>
+          <p style="font-size:15px;color:var(--ink-2);line-height:1.7;margin-top:8px">{sec.p}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+</PageShell>

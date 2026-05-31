@@ -1,0 +1,57 @@
+---
+/**
+ * HowItWorksPage - /how-it-works. The "one trip, one place" pitch: page hero,
+ * the three steps, a one-place reinforcement strip, the interactive trip
+ * dashboard, and a closing CTA.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+import HowItWorks from "../HowItWorks.astro";
+import TripDashboard from "../TripDashboard.astro";
+import CTASection from "../CTASection.astro";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const h = s.how;
+---
+<PageShell lang={lang} active="howItWorks" meta={h.meta}>
+  <PageHero title={h.hero.title} lead={h.hero.lead} />
+  <HowItWorks lang={lang} />
+
+  <section class="wrap" style="padding-block:72px;border-top:1px solid var(--rule)">
+    <p class="eyebrow reveal">{s.oneplace.kicker}</p>
+    <h2 class="section-title reveal" style="margin-top:10px">{s.oneplace.title}</h2>
+    <p class="lead reveal" style="margin-top:10px">{s.oneplace.lead}</p>
+    <div class="bl-one4 reveal">
+      {s.oneplace.points.map((p, i) => (
+        <div class="bl-one">
+          <span class="bl-one-num">{i + 1}</span>
+          <h3 class="bl-one-title">{p.t}</h3>
+          <p class="bl-one-desc">{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <TripDashboard lang={lang} />
+
+  <CTASection
+    title={h.cta.title}
+    body={h.cta.body}
+    ctaLabel={h.cta.label}
+    ctaHref={href(lang, "destinations")}
+    secondaryLabel={s.nav.trust}
+    secondaryHref={href(lang, "trust")}
+  />
+</PageShell>
+
+<style>
+  .bl-one4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 28px; }
+  .bl-one-num { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--accent); color: var(--accent-2); font-weight: 800; font-size: 15px; }
+  .bl-one-title { font-size: 16px; font-weight: 700; margin-top: 14px; }
+  .bl-one-desc { font-size: 13.5px; color: var(--ink-2); margin-top: 6px; line-height: 1.55; }
+  @media (max-width: 900px) { .bl-one4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 460px) { .bl-one4 { grid-template-columns: 1fr; } }
+</style>

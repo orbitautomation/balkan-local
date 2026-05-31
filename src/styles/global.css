@@ -1,0 +1,126 @@
+/* global.css - Tailwind layers + base element styles + fonts + helpers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "General Sans";
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url("/fonts/general-sans-var.woff2") format("woff2");
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-text);
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Arabic gets a face with proper glyphs; falls back gracefully if unavailable. */
+  :root[lang="ar"] body,
+  [dir="rtl"] body {
+    font-family: "IBM Plex Sans Arabic", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .wrap {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 12px 22px;
+    border-radius: var(--r-pill);
+    border: 0;
+    cursor: pointer;
+    text-decoration: none;
+    background: var(--accent);
+    color: var(--accent-ink);
+    min-height: var(--tap-min);
+    transition: transform var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease);
+  }
+  .btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule-hi);
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 13px;
+    border-radius: var(--r-pill);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-card);
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--accent-2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .section-title {
+    font-size: clamp(26px, 3.6vw, 38px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .lead {
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 62ch;
+  }
+}
+
+/* Brand logo theme swap. The mark's inner map is cream on the dark theme and
+   indigo on the light theme. Dark is the default, so the cream icon shows
+   first; the anti-FOUC gate sets [data-theme] before paint, and toggling the
+   theme flips these instantly (pure CSS, no JS needed). */
+.bl-logo-on-dark { display: block; }
+.bl-logo-on-light { display: none; }
+:root[data-theme="light"] .bl-logo-on-dark { display: none; }
+:root[data-theme="light"] .bl-logo-on-light { display: block; }
+
+/* Reveal-on-scroll (progressive; visible by default if JS/IO unavailable) */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }

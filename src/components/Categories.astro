@@ -1,0 +1,53 @@
+---
+/**
+ * Categories - the "what you can arrange" showcase. Refined monoline icons
+ * (no emoji) keyed by index. The property card links to /property; the rest
+ * are presentational on the home/experiences pages.
+ */
+import { type Locale, t, href } from "../i18n/ui";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+
+// Monoline icons, one per category (stays, transfers, guides, dining, connectivity, property).
+const icons = [
+  '<path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18"/><path d="M9 21v-6h6v6"/>',
+  '<path d="M5 13l1.6-4.5A2 2 0 0 1 8.5 7h7a2 2 0 0 1 1.9 1.5L19 13"/><path d="M4 13h16v4H4z"/><path d="M7 17v2M17 17v2"/>',
+  '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.2 4.8-4.8 2.2 2.2-4.8z"/>',
+  '<path d="M5 3v7a2 2 0 0 0 4 0V3M7 10v11"/><path d="M16 3c-1.4 0-2.3 2-2.3 4.8 0 2 .9 3.4 2.3 3.4M16 3v18"/>',
+  '<path d="M4 12.5a11 11 0 0 1 16 0"/><path d="M7.5 16a6 6 0 0 1 9 0"/><circle cx="12" cy="19" r="1"/>',
+  '<path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
+];
+---
+<section id="categories" class="wrap" style="padding-block:72px;border-top:1px solid var(--rule)">
+  <p class="eyebrow reveal">{s.categories.kicker}</p>
+  <h2 class="section-title reveal" style="margin-top:10px">{s.categories.title}</h2>
+  <p class="lead reveal" style="margin-top:10px">{s.categories.lead}</p>
+
+  <div class="bl-cat-grid reveal">
+    {s.categories.items.map((c, i) => {
+      const isProp = i === 5;
+      const Tag = isProp ? "a" : "div";
+      return (
+        <Tag href={isProp ? href(lang, "property") : undefined} class="bl-cat">
+          <span class="bl-cat-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={icons[i]} />
+          </span>
+          <h3 class="bl-cat-title">{c.t}</h3>
+          <p class="bl-cat-desc">{c.d}</p>
+        </Tag>
+      );
+    })}
+  </div>
+</section>
+
+<style>
+  #categories :global(.bl-cat-grid) { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 32px; background: var(--rule); border: 1px solid var(--rule); border-radius: var(--r-lg); overflow: hidden; }
+  #categories :global(.bl-cat) { background: var(--bg); padding: 28px 26px; text-decoration: none; color: inherit; display: block; transition: background var(--dur) var(--ease); }
+  #categories :global(.bl-cat:hover) { background: var(--surface); }
+  #categories :global(.bl-cat-icon) { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--accent-glow); color: var(--accent-2); margin-bottom: 16px; }
+  #categories :global(.bl-cat-title) { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  #categories :global(.bl-cat-desc) { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+  @media (max-width: 860px) { #categories :global(.bl-cat-grid) { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { #categories :global(.bl-cat-grid) { grid-template-columns: 1fr; } }
+</style>

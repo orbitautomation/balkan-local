@@ -1,0 +1,63 @@
+---
+/**
+ * AboutPage - /about. Story, mission, values, the two audiences, a contact
+ * section (#contact) and a closing CTA.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+import DiasporaGulf from "../DiasporaGulf.astro";
+import CTASection from "../CTASection.astro";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const a = s.about;
+---
+<PageShell lang={lang} active="about" meta={a.meta}>
+  <PageHero title={a.hero.title} lead={a.hero.lead} />
+
+  <section class="wrap" style="padding-block:48px;border-top:1px solid var(--rule)">
+    <div class="reveal" style="max-width:720px;display:flex;flex-direction:column;gap:16px">
+      {a.story.map((para) => (
+        <p style="font-size:16px;color:var(--ink-2);line-height:1.7">{para}</p>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-block:8px 48px">
+    <div class="card reveal" style="padding:30px;background:var(--hero-grad)">
+      <h2 style="font-size:20px;font-weight:800">{a.mission.title}</h2>
+      <p class="lead" style="margin-top:8px">{a.mission.body}</p>
+    </div>
+    <h3 class="reveal" style="font-size:18px;font-weight:800;margin-top:32px">{a.values.title}</h3>
+    <div class="bl-vals reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px">
+      {a.values.items.map((v) => (
+        <div class="card" style="padding:20px">
+          <h4 style="font-size:15px;font-weight:700">{v.t}</h4>
+          <p style="font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.55">{v.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <DiasporaGulf lang={lang} />
+
+  <section id="contact" class="wrap" style="padding-block:48px;border-top:1px solid var(--rule)">
+    <h2 class="section-title reveal">{a.contact.title}</h2>
+    <p class="lead reveal" style="margin-top:8px">{a.contact.body}</p>
+    <a class="btn reveal" href={`mailto:${a.contact.email}`} style="margin-top:18px">{a.contact.email}</a>
+  </section>
+
+  <CTASection
+    title={a.cta.title}
+    body={a.cta.body}
+    ctaLabel={a.cta.label}
+    ctaHref={href(lang, "experiences")}
+  />
+</PageShell>
+
+<style>
+  @media (max-width: 860px) { .bl-vals { grid-template-columns: 1fr 1fr !important; } }
+  @media (max-width: 460px) { .bl-vals { grid-template-columns: 1fr !important; } }
+</style>

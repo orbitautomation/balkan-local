@@ -1,0 +1,24 @@
+---
+import { type Locale, t } from "../i18n/ui";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+---
+<section class="wrap" style="padding-block:56px;border-top:1px solid var(--rule)">
+  <p class="eyebrow reveal">{s.social.kicker}</p>
+  <h2 class="section-title reveal" style="margin-top:10px">{s.social.title}</h2>
+
+  <div class="bl-quotes reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px">
+    {s.social.quotes.map((q) => (
+      <figure class="card" style="padding:24px;margin:0">
+        <div style="color:var(--accent);font-size:30px;line-height:1;font-weight:800">&ldquo;</div>
+        <blockquote style="font-size:15px;line-height:1.6;margin-top:6px">{q.q}</blockquote>
+        <figcaption style="font-size:13px;color:var(--ink-3);margin-top:14px">{q.a}</figcaption>
+      </figure>
+    ))}
+  </div>
+</section>
+
+<style>
+  @media (max-width: 760px) { section :global(.bl-quotes) { grid-template-columns: 1fr !important; } }
+</style>

@@ -1,0 +1,25 @@
+---
+/**
+ * PageHero - reusable page header (eyebrow + h1 + lead + optional CTA) for the
+ * sub-pages. Each page provides exactly one h1 here for SEO. Prop-driven, no
+ * i18n coupling.
+ */
+export interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+const { eyebrow, title, lead, ctaLabel, ctaHref } = Astro.props;
+---
+<section class="wrap" style="padding-block:68px 36px;background:var(--hero-grad)">
+  {eyebrow && <p class="eyebrow reveal">{eyebrow}</p>}
+  <h1 class="font-display reveal" style="font-size:clamp(30px,4.6vw,48px);line-height:1.06;letter-spacing:-0.02em;font-weight:800;margin-top:12px;max-width:20ch">{title}</h1>
+  {lead && <p class="lead reveal" style="margin-top:14px;font-size:clamp(15px,1.7vw,18px)">{lead}</p>}
+  {ctaLabel && ctaHref && (
+    <div class="reveal" style="margin-top:24px">
+      <a href={ctaHref} class="btn">{ctaLabel}</a>
+    </div>
+  )}
+</section>

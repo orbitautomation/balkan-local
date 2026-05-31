@@ -1,0 +1,64 @@
+---
+/**
+ * AuthShell - a focused, centered layout for the auth pages (log in / sign up).
+ * Reuses BaseLayout (theme, SEO, fonts) but swaps the marketing chrome for a
+ * minimal header (brand + back to site) so the form is the sole focus.
+ */
+import { type Locale, type RouteKey, t, href } from "../i18n/ui";
+import BaseLayout from "../layouts/BaseLayout.astro";
+export interface Props { lang: Locale; active: RouteKey; meta: { title: string; description: string } }
+const { lang, active, meta } = Astro.props;
+const s = t(lang);
+---
+<BaseLayout lang={lang} active={active} meta={meta}>
+  <div class="bl-auth">
+    <header class="bl-auth-top wrap">
+      <a href={href(lang, "home")} class="bl-brand" aria-label="Balkan Local">
+        <img src="/brand/icon-cream.svg" alt="" class="bl-logo-on-dark" style="height:28px;width:28px" />
+        <img src="/brand/icon-indigo.svg" alt="" class="bl-logo-on-light" style="height:28px;width:28px" />
+        Balkan Local
+      </a>
+      <button data-theme-toggle type="button" aria-label={s.nav.toggleTheme} class="bl-auth-toggle">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"></path></svg>
+      </button>
+    </header>
+    <main id="main" tabindex="-1" class="bl-auth-main">
+      <div class="bl-auth-card card">
+        <slot />
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .bl-auth { min-height: 100vh; display: flex; flex-direction: column; background: var(--hero-grad); }
+  .bl-auth-top { display: flex; align-items: center; justify-content: space-between; padding-block: 20px; }
+  .bl-brand { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+  .bl-auth-toggle { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--rule); border-radius: var(--r-pill); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+  .bl-auth-main { flex: 1; display: grid; place-items: center; padding: 32px 24px 64px; }
+  .bl-auth-card { width: 100%; max-width: 420px; padding: 36px 32px; }
+  @media (max-width: 480px) { .bl-auth-card { padding: 28px 22px; } }
+</style>
+
+<!-- Shared auth-form styles. These live here (the shell both /login and /signup
+     wrap) and are `is:global` because the <form> is slotted in from the page
+     component, so scoped styles wouldn't reach it. Previously these lived only
+     in LoginPage, so /signup rendered them unstyled. -->
+<style is:global>
+  .bl-auth-title { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+  .bl-auth-lead { font-size: 14.5px; color: var(--ink-2); margin-top: 8px; }
+  .bl-auth-form { display: flex; flex-direction: column; margin-top: 24px; }
+  .bl-auth-label { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin: 14px 0 6px; }
+  .bl-auth-form > .bl-auth-label:first-child { margin-top: 0; }
+  .bl-auth-input { width: 100%; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 10px; color: var(--ink); font: inherit; font-size: 14px; padding: 11px 13px; }
+  .bl-auth-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .bl-auth-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .bl-auth-mini { font-size: 12px; color: var(--accent-2); text-decoration: none; }
+  .bl-auth-mini:hover { text-decoration: underline; }
+  .bl-auth-err { color: #ef7d80; font-size: 12.5px; font-weight: 600; margin-top: 12px; }
+  .bl-auth-submit { width: 100%; margin-top: 20px; }
+  .bl-auth-switch { font-size: 13.5px; color: var(--ink-2); margin-top: 20px; text-align: center; }
+  .bl-auth-switch a { color: var(--accent-2); font-weight: 600; text-decoration: none; }
+  .bl-auth-switch a:hover { text-decoration: underline; }
+  .bl-auth-note { font-size: 11.5px; color: var(--ink-3); margin-top: 18px; text-align: center; line-height: 1.5; }
+</style>

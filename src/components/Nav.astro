@@ -1,0 +1,153 @@
+---
+/**
+ * Nav - site header. Lean desktop navigation with a consumer-facing CTA
+ * ("Log in" to the dashboard + "Get started"). The language switcher lives in
+ * the mobile drawer only (English-first phase). Business links live in the
+ * footer and the drawer, not the primary consumer CTA.
+ */
+import { type Locale, type RouteKey, t, LOCALES, LOCALE_LABEL, DIR, href } from "../i18n/ui";
+export interface Props { lang: Locale; active?: RouteKey }
+const { lang, active = "home" } = Astro.props;
+const s = t(lang);
+
+const links: { key: RouteKey; label: string }[] = [
+  { key: "destinations", label: s.nav.destinations },
+  { key: "experiences", label: s.nav.experiences },
+  { key: "howItWorks", label: s.nav.howItWorks },
+  { key: "trust", label: s.nav.trust },
+];
+
+// In RTL the switcher reads from the right, so the native locale comes first.
+const switcherOrder = DIR[lang] === "rtl" ? [...LOCALES].reverse() : LOCALES;
+---
+<header class="bl-header">
+  <nav class="wrap bl-nav" aria-label="Primary">
+    <a href={href(lang, "home")} class="bl-brand" aria-label="Balkan Local">
+      <img src="/brand/icon-cream.svg" alt="" class="bl-emblem bl-logo-on-dark" width="32" height="32" />
+      <img src="/brand/icon-indigo.svg" alt="" class="bl-emblem bl-logo-on-light" width="32" height="32" />
+      <span class="bl-brand-text">Balkan Local</span>
+    </a>
+
+    <div class="bl-nav-links">
+      {links.map((l) => (
+        <a href={href(lang, l.key)} class="bl-navlink" aria-current={l.key === active ? "page" : undefined}>{l.label}</a>
+      ))}
+    </div>
+
+    <div class="bl-nav-actions">
+      <div class="bl-lang" role="group" aria-label={s.nav.language}>
+        {switcherOrder.map((l) => (
+          <a href={href(l, active)} hreflang={l} aria-current={l === lang ? true : undefined} class="bl-lang-pill" data-on={l === lang}><span lang={l}>{LOCALE_LABEL[l]}</span></a>
+        ))}
+      </div>
+      <button data-theme-toggle type="button" aria-label={s.nav.toggleTheme} class="bl-icon-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"></path></svg>
+      </button>
+      <a href={href(lang, "login")} class="bl-login">{s.nav.login}</a>
+      <a href={href(lang, "signup")} class="btn bl-cta">{s.nav.getStarted}</a>
+
+      <button data-menu-toggle type="button" aria-label={s.nav.menu} aria-expanded="false" aria-controls="bl-mobile-menu" class="bl-icon-btn bl-burger">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile drawer -->
+  <div id="bl-mobile-menu" class="bl-drawer" hidden>
+    <div class="wrap bl-drawer-inner">
+      {links.map((l) => (
+        <a href={href(lang, l.key)} class="bl-mlink" aria-current={l.key === active ? "page" : undefined}>{l.label}</a>
+      ))}
+      <a href={href(lang, "about")} class="bl-mlink" aria-current={active === "about" ? "page" : undefined}>{s.nav.about}</a>
+      <a href={href(lang, "business")} class="bl-mlink bl-mlink-muted" aria-current={active === "business" ? "page" : undefined}>{s.nav.business}</a>
+
+      <div class="bl-drawer-actions">
+        <a href={href(lang, "login")} class="btn btn-ghost" style="flex:1">{s.nav.login}</a>
+        <a href={href(lang, "signup")} class="btn" style="flex:1">{s.nav.getStarted}</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .bl-header {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(160%) blur(14px);
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    border-bottom: 1px solid var(--rule);
+  }
+  .bl-nav { display: flex; align-items: center; gap: 24px; min-height: 66px; }
+  .bl-brand {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: var(--font-display); font-weight: 700; font-size: 18px;
+    letter-spacing: -0.02em; color: var(--ink); text-decoration: none; flex: none;
+  }
+  /* display is owned by the global .bl-logo-on-dark/.bl-logo-on-light theme-swap
+     rules; setting it here would out-specificity them and show both variants. */
+  .bl-emblem { height: 30px; width: 30px; }
+  .bl-brand-text { line-height: 1; }
+
+  .bl-nav-links { display: none; align-items: center; gap: 28px; }
+  .bl-navlink {
+    font-size: 14.5px; font-weight: 500; color: var(--ink-2); text-decoration: none;
+    transition: color var(--dur-fast) var(--ease); white-space: nowrap;
+  }
+  .bl-navlink:hover { color: var(--ink); }
+  .bl-navlink[aria-current="page"] { color: var(--ink); }
+
+  .bl-nav-actions { display: flex; align-items: center; gap: 10px; margin-inline-start: auto; }
+
+  /* Compact language switcher (next to the theme toggle, all viewports) */
+  .bl-lang { display: inline-flex; align-items: center; border: 1px solid var(--rule); background: var(--surface); border-radius: var(--r-pill); overflow: hidden; }
+  .bl-lang-pill { font-size: 12px; font-weight: 700; padding: 6px 9px; text-decoration: none; color: var(--ink-3); line-height: 1; }
+  .bl-lang-pill:hover { color: var(--ink); }
+  .bl-lang-pill[data-on="true"] { background: var(--accent); color: var(--accent-ink); }
+  .bl-icon-btn {
+    width: 40px; height: 40px; display: grid; place-items: center; flex: none;
+    border: 1px solid var(--rule); border-radius: var(--r-pill); background: var(--surface);
+    color: var(--ink-2); cursor: pointer;
+  }
+  .bl-icon-btn:hover { color: var(--ink); }
+  .bl-login { display: none; font-size: 14px; font-weight: 600; color: var(--ink-2); text-decoration: none; white-space: nowrap; padding: 0 4px; }
+  .bl-login:hover { color: var(--ink); }
+  .bl-cta { display: none; padding: 9px 18px; font-size: 14px; white-space: nowrap; }
+
+  /* Desktop */
+  @media (min-width: 1024px) {
+    .bl-nav-links { display: flex; }
+    .bl-login, .bl-cta { display: inline-flex; }
+    .bl-burger { display: none; }
+  }
+
+  /* Drawer */
+  .bl-drawer { border-top: 1px solid var(--rule); background: var(--bg-2); }
+  .bl-drawer-inner { display: flex; flex-direction: column; gap: 2px; padding-block: 14px 22px; }
+  .bl-mlink { display: block; padding: 13px 8px; border-radius: 10px; font-size: 16px; font-weight: 600; color: var(--ink-2); text-decoration: none; }
+  .bl-mlink:hover { background: var(--surface); color: var(--ink); }
+  .bl-mlink[aria-current="page"] { color: var(--accent); }
+  .bl-mlink-muted { color: var(--ink-3); font-weight: 500; }
+  .bl-drawer-actions { display: flex; gap: 10px; margin-top: 14px; }
+  @media (min-width: 1024px) { .bl-drawer { display: none; } }
+</style>
+
+<script is:inline>
+  (function () {
+    var btn = document.querySelector("[data-menu-toggle]");
+    var menu = document.getElementById("bl-mobile-menu");
+    if (!btn || !menu) return;
+    function setOpen(open) {
+      menu.hidden = !open;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function (e) { e.stopPropagation(); setOpen(menu.hidden); });
+    menu.addEventListener("click", function (e) { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) setOpen(false); });
+    document.addEventListener("click", function (e) {
+      if (menu.hidden) return;
+      if (!menu.contains(e.target) && !btn.contains(e.target)) setOpen(false);
+    });
+    var mq = window.matchMedia("(min-width: 1024px)");
+    if (mq.addEventListener) mq.addEventListener("change", function (e) { if (e.matches) setOpen(false); });
+  })();
+</script>

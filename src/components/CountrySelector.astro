@@ -1,0 +1,68 @@
+---
+/**
+ * CountrySelector - "where are you headed?" Bosnia is live and clickable;
+ * the rest of the Balkans is greyed out (aria-disabled) with a "coming soon"
+ * label and a clear note. Country list + copy come from the i18n tree.
+ */
+import { type Locale, t, href } from "../i18n/ui";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const c = s.countries;
+const exploreHref = href(lang, "experiences");
+---
+<section id="destinations-picker" class="wrap" style="padding-block:48px;border-top:1px solid var(--rule)">
+  <p class="eyebrow reveal">{c.kicker}</p>
+  <h2 class="section-title reveal" style="margin-top:10px">{c.title}</h2>
+
+  <div class="bl-countries reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px">
+    {c.list.map((country) =>
+      country.status === "live" ? (
+        <a href={exploreHref} class="bl-country bl-country-live">
+          <span class="bl-flag" aria-hidden="true">{country.flag}</span>
+          <span class="bl-cname">{country.name}</span>
+          <span class="bl-cstatus bl-live">{c.liveLabel}</span>
+        </a>
+      ) : (
+        <div class="bl-country bl-country-soon" aria-disabled="true">
+          <span class="bl-flag" aria-hidden="true">{country.flag}</span>
+          <span class="bl-cname">{country.name}</span>
+          <span class="bl-cstatus bl-soon">{c.soonLabel}</span>
+        </div>
+      )
+    )}
+  </div>
+
+  <p class="reveal" style="font-size:13px;color:var(--ink-3);margin-top:16px;display:flex;align-items:center;gap:8px;line-height:1.5">
+    <span aria-hidden="true">&#8505;&#65039;</span><span>{c.activeNote}</span>
+  </p>
+</section>
+
+<style>
+  .bl-country {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 18px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    text-decoration: none;
+    color: inherit;
+  }
+  .bl-country-live {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), var(--shadow-card);
+    transition: transform var(--dur) var(--ease);
+  }
+  .bl-country-live:hover { transform: translateY(-3px); }
+  .bl-country-soon { opacity: 0.55; filter: grayscale(0.55); cursor: not-allowed; }
+  .bl-flag { font-size: 30px; line-height: 1; }
+  .bl-cname { font-size: 15px; font-weight: 700; }
+  .bl-cstatus { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: var(--r-pill); }
+  .bl-live { background: var(--success-soft); color: var(--success); }
+  .bl-soon { background: var(--surface-2); color: var(--ink-3); }
+  @media (max-width: 720px) { .bl-countries { grid-template-columns: 1fr 1fr !important; } }
+  @media (max-width: 420px) { .bl-countries { grid-template-columns: 1fr !important; } }
+</style>

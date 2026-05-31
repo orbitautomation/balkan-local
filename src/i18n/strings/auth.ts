@@ -1,0 +1,133 @@
+/**
+ * auth.ts - copy for the front-end-only auth pages (log in, sign up) and the
+ * logged-in dashboard preview. `de`/`ar` typed `typeof en` (missing key fails
+ * the build). No backend: forms validate then route to the dashboard preview.
+ */
+
+const en = {
+  login: {
+    meta: { title: "Log in | Balkan Local", description: "Log in to your Balkan Local dashboard to plan, book and manage your trip." },
+    title: "Welcome back.",
+    lead: "Log in to pick up where you left off.",
+    email: "Email",
+    password: "Password",
+    submit: "Log in",
+    forgot: "Forgot your password?",
+    noAccount: "New to Balkan Local?",
+    switch: "Create an account",
+    or: "or",
+    demoNote: "This is a front-end preview. No account is required and nothing is sent.",
+    required: "Please complete this field.",
+    emailInvalid: "Please enter a valid email address.",
+  },
+  signup: {
+    meta: { title: "Get started | Balkan Local", description: "Create your Balkan Local account and plan your whole trip from one place." },
+    title: "Plan your trip with confidence.",
+    lead: "Create your account to plan, book and manage everything in one place.",
+    name: "Full name",
+    email: "Email",
+    password: "Password",
+    submit: "Create account",
+    haveAccount: "Already have an account?",
+    switch: "Log in",
+    terms: "By continuing you agree to our Terms and Privacy Policy.",
+    demoNote: "This is a front-end preview. No account is required and nothing is sent.",
+    required: "Please complete this field.",
+    emailInvalid: "Please enter a valid email address.",
+  },
+  dashboard: {
+    meta: { title: "Your dashboard | Balkan Local", description: "Your trip, organised in one place." },
+    welcome: "Welcome back",
+    sampleName: "Traveler",
+    subtitle: "Here is your upcoming trip, all in one place.",
+    newTrip: "Plan a new trip",
+    logout: "Log out",
+    previewNote: "This is a preview of your traveler dashboard. Live booking is on the way.",
+  },
+};
+
+const de: typeof en = {
+  login: {
+    meta: { title: "Anmelden | Balkan Local", description: "Melde dich in deinem Balkan-Local-Dashboard an, um deine Reise zu planen, zu buchen und zu verwalten." },
+    title: "Willkommen zurück.",
+    lead: "Melde dich an und mach dort weiter, wo du aufgehört hast.",
+    email: "E-Mail",
+    password: "Passwort",
+    submit: "Anmelden",
+    forgot: "Passwort vergessen?",
+    noAccount: "Neu bei Balkan Local?",
+    switch: "Konto erstellen",
+    or: "oder",
+    demoNote: "Dies ist eine Frontend-Vorschau. Kein Konto erforderlich, es wird nichts gesendet.",
+    required: "Bitte fülle dieses Feld aus.",
+    emailInvalid: "Bitte gib eine gültige E-Mail-Adresse ein.",
+  },
+  signup: {
+    meta: { title: "Loslegen | Balkan Local", description: "Erstelle dein Balkan-Local-Konto und plane deine ganze Reise an einem Ort." },
+    title: "Plane deine Reise mit Sicherheit.",
+    lead: "Erstelle dein Konto, um alles an einem Ort zu planen, zu buchen und zu verwalten.",
+    name: "Vollständiger Name",
+    email: "E-Mail",
+    password: "Passwort",
+    submit: "Konto erstellen",
+    haveAccount: "Hast du schon ein Konto?",
+    switch: "Anmelden",
+    terms: "Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
+    demoNote: "Dies ist eine Frontend-Vorschau. Kein Konto erforderlich, es wird nichts gesendet.",
+    required: "Bitte fülle dieses Feld aus.",
+    emailInvalid: "Bitte gib eine gültige E-Mail-Adresse ein.",
+  },
+  dashboard: {
+    meta: { title: "Dein Dashboard | Balkan Local", description: "Deine Reise, an einem Ort organisiert." },
+    welcome: "Willkommen zurück",
+    sampleName: "Reisender",
+    subtitle: "Hier ist deine bevorstehende Reise, alles an einem Ort.",
+    newTrip: "Neue Reise planen",
+    logout: "Abmelden",
+    previewNote: "Dies ist eine Vorschau deines Reise-Dashboards. Die Live-Buchung kommt bald.",
+  },
+};
+
+const ar: typeof en = {
+  login: {
+    meta: { title: "تسجيل الدخول | Balkan Local", description: "سجّل الدخول إلى لوحة تحكّمك في Balkan Local لتخطّط رحلتك وتحجزها وتديرها." },
+    title: "مرحباً بعودتك.",
+    lead: "سجّل الدخول لتكمل من حيث توقّفت.",
+    email: "البريد الإلكتروني",
+    password: "كلمة المرور",
+    submit: "تسجيل الدخول",
+    forgot: "نسيت كلمة المرور؟",
+    noAccount: "جديد على Balkan Local؟",
+    switch: "أنشئ حساباً",
+    or: "أو",
+    demoNote: "هذه معاينة للواجهة الأمامية. لا حاجة لحساب ولا يُرسَل أي شيء.",
+    required: "يرجى إكمال هذا الحقل.",
+    emailInvalid: "يرجى إدخال بريد إلكتروني صالح.",
+  },
+  signup: {
+    meta: { title: "ابدأ الآن | Balkan Local", description: "أنشئ حسابك في Balkan Local وخطّط رحلتك كاملة من مكان واحد." },
+    title: "خطّط رحلتك بثقة.",
+    lead: "أنشئ حسابك لتخطّط وتحجز وتدير كل شيء في مكان واحد.",
+    name: "الاسم الكامل",
+    email: "البريد الإلكتروني",
+    password: "كلمة المرور",
+    submit: "إنشاء حساب",
+    haveAccount: "لديك حساب بالفعل؟",
+    switch: "تسجيل الدخول",
+    terms: "بالمتابعة فإنك توافق على الشروط وسياسة الخصوصية.",
+    demoNote: "هذه معاينة للواجهة الأمامية. لا حاجة لحساب ولا يُرسَل أي شيء.",
+    required: "يرجى إكمال هذا الحقل.",
+    emailInvalid: "يرجى إدخال بريد إلكتروني صالح.",
+  },
+  dashboard: {
+    meta: { title: "لوحة تحكّمك | Balkan Local", description: "رحلتك، منظّمة في مكان واحد." },
+    welcome: "مرحباً بعودتك",
+    sampleName: "المسافر",
+    subtitle: "إليك رحلتك القادمة، كلها في مكان واحد.",
+    newTrip: "خطّط رحلة جديدة",
+    logout: "تسجيل الخروج",
+    previewNote: "هذه معاينة للوحة تحكّم المسافر. الحجز المباشر في الطريق.",
+  },
+};
+
+export { en, de, ar };

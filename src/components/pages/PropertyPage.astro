@@ -1,0 +1,46 @@
+---
+/**
+ * PropertyPage - /property. The realtor qualified-lead model: a buyer "how it
+ * works", then the buy-intent capture form (existing Property section), plus a
+ * closing CTA. We are an introducer, not a broker.
+ */
+import { type Locale, t } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+import Property from "../Property.astro";
+import CTASection from "../CTASection.astro";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const p = s.property;
+---
+<PageShell lang={lang} active="property" meta={p.meta}>
+  <PageHero title={p.hero.title} lead={p.hero.lead} />
+
+  <section class="wrap" style="padding-block:48px;border-top:1px solid var(--rule)">
+    <h2 class="section-title reveal">{p.intro.title}</h2>
+    <div class="bl-psteps reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px">
+      {p.intro.steps.map((step, i) => (
+        <div class="card" style="padding:20px">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:800;display:grid;place-items:center">{i + 1}</div>
+          <p style="font-size:13.5px;color:var(--ink-2);margin-top:12px;line-height:1.55">{step}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <Property lang={lang} />
+
+  <CTASection
+    title={p.cta.title}
+    body={p.cta.body}
+    ctaLabel={p.cta.label}
+    ctaHref="#bl-prop-form"
+  />
+</PageShell>
+
+<style>
+  @media (max-width: 860px) { .bl-psteps { grid-template-columns: 1fr 1fr !important; } }
+  @media (max-width: 460px) { .bl-psteps { grid-template-columns: 1fr !important; } }
+</style>

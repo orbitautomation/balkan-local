@@ -1,0 +1,53 @@
+---
+/**
+ * TrustPage - /trust. How we verify (docs/licenses/ownership), the no-scam
+ * guarantee, the Verified badge explainer, and social proof.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+import TrustBar from "../TrustBar.astro";
+import SocialProof from "../SocialProof.astro";
+import VerifiedBadge from "../VerifiedBadge.astro";
+import CTASection from "../CTASection.astro";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const tr = s.trust;
+---
+<PageShell lang={lang} active="trust" meta={tr.meta}>
+  <PageHero eyebrow={tr.kicker} title={tr.hero.title} lead={tr.hero.lead} />
+  <TrustBar lang={lang} />
+
+  <section class="wrap" style="padding-block:56px;border-top:1px solid var(--rule)">
+    <h2 class="section-title reveal">{tr.verifyTitle}</h2>
+    <ol class="reveal" style="margin-top:22px;display:grid;gap:12px;list-style:none;padding:0;max-width:760px">
+      {tr.verifySteps.map((step, i) => (
+        <li style="display:flex;gap:14px;align-items:flex-start">
+          <span style="flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:800;display:grid;place-items:center">{i + 1}</span>
+          <span style="font-size:15px;color:var(--ink-2);line-height:1.55;padding-top:4px">{step}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="wrap" style="padding-block:8px 56px">
+    <div class="card reveal" style="padding:32px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+      <VerifiedBadge label={tr.badgeLabel} />
+      <div style="flex:1;min-width:240px">
+        <h3 style="font-size:18px;font-weight:800">{tr.badgeTitle}</h3>
+        <p style="font-size:14.5px;color:var(--ink-2);margin-top:8px;line-height:1.6">{tr.badgeBody}</p>
+      </div>
+    </div>
+  </section>
+
+  <SocialProof lang={lang} />
+
+  <CTASection
+    title={tr.cta.title}
+    body={tr.cta.body}
+    ctaLabel={tr.cta.label}
+    ctaHref={href(lang, "experiences")}
+  />
+</PageShell>

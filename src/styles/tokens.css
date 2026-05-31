@@ -1,0 +1,91 @@
+/* ============================================================
+   Balkan Local - design tokens (Sarajevo Twilight)
+   Dark = default (night-bazaar / Bascarsija lanterns).
+   Light = a cream companion theme. Both selected via [data-theme].
+   ============================================================ */
+
+:root,
+:root[data-theme="dark"] {
+  /* Type + motion (theme-invariant) */
+  --font-display: "General Sans", "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
+  --font-text: "General Sans", "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-pill: 999px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 160ms;
+  --dur: 240ms;
+  --dur-slow: 520ms;
+  --tap-min: 44px;
+  --maxw: 1120px;
+
+  /* Sarajevo Twilight - DARK (default) */
+  --bg: #1e1b4b;          /* deep indigo */
+  --bg-2: #2a2660;
+  --bg-3: #15123a;
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-2: rgba(255, 255, 255, 0.10);
+  --ink: #faf6ef;         /* cream */
+  --ink-2: rgba(250, 246, 239, 0.74);
+  --ink-3: rgba(250, 246, 239, 0.52);
+  --rule: rgba(250, 246, 239, 0.14);
+  --rule-hi: rgba(250, 246, 239, 0.24);
+
+  --accent: #c8a24b;      /* brass / gold */
+  --accent-2: #e0be6a;
+  --accent-deep: #a8842f;
+  --accent-ink: #1e1b4b;
+  --accent-glow: rgba(200, 162, 75, 0.22);
+
+  --success: #14b8a1;     /* teal = "verified" */
+  --success-ink: #04241f;
+  --success-soft: rgba(20, 184, 161, 0.16);
+
+  --hero-grad:
+    radial-gradient(120% 120% at 82% -10%, rgba(200, 162, 75, 0.22) 0%, rgba(200, 162, 75, 0) 55%),
+    radial-gradient(120% 120% at 0% 112%, rgba(20, 184, 161, 0.16) 0%, rgba(20, 184, 161, 0) 50%);
+
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 16px 40px -22px rgba(0, 0, 0, 0.7);
+  --shadow-pop: 0 24px 60px -24px rgba(0, 0, 0, 0.8);
+}
+
+:root[data-theme="light"] {
+  /* Sarajevo Twilight - LIGHT companion */
+  --bg: #faf6ef;          /* cream */
+  --bg-2: #ffffff;
+  --bg-3: #f0ead9;
+  --surface: #ffffff;
+  --surface-2: #f4eede;
+  --ink: #1e1b4b;         /* indigo ink */
+  --ink-2: rgba(30, 27, 75, 0.74);
+  --ink-3: rgba(30, 27, 75, 0.52);
+  --rule: rgba(30, 27, 75, 0.12);
+  --rule-hi: rgba(30, 27, 75, 0.20);
+
+  --accent: #a8842f;      /* gold, darkened for contrast on cream */
+  --accent-2: #c8a24b;
+  --accent-deep: #8a6d27;
+  --accent-ink: #ffffff;
+  --accent-glow: rgba(168, 132, 47, 0.18);
+
+  --success: #0c7d6d;
+  --success-ink: #ffffff;
+  --success-soft: rgba(12, 125, 109, 0.12);
+
+  --hero-grad:
+    radial-gradient(120% 120% at 82% -10%, rgba(168, 132, 47, 0.14) 0%, rgba(168, 132, 47, 0) 55%),
+    radial-gradient(120% 120% at 0% 112%, rgba(12, 125, 109, 0.10) 0%, rgba(12, 125, 109, 0) 50%);
+
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 14px 34px -20px rgba(30, 27, 75, 0.22);
+  --shadow-pop: 0 24px 60px -24px rgba(30, 27, 75, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+    --dur-slow: 0ms;
+  }
+}

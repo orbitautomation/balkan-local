@@ -1,0 +1,26 @@
+---
+/**
+ * PageShell - the chrome wrapper every page renders: BaseLayout (html shell +
+ * SEO) + Nav + <main> + Footer. A page supplies its `active` route key and
+ * `meta`, then drops its sections into the default slot. Defined once here so
+ * no page repeats the chrome.
+ */
+import { type Locale, type RouteKey } from "../i18n/ui";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Nav from "./Nav.astro";
+import Footer from "./Footer.astro";
+
+export interface Props {
+  lang: Locale;
+  active?: RouteKey;
+  meta?: { title: string; description: string };
+}
+const { lang, active = "home", meta } = Astro.props;
+---
+<BaseLayout lang={lang} active={active} meta={meta}>
+  <Nav lang={lang} active={active} />
+  <main id="main" tabindex="-1" style="outline:none">
+    <slot />
+  </main>
+  <Footer lang={lang} active={active} />
+</BaseLayout>

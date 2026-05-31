@@ -1,0 +1,60 @@
+---
+/**
+ * SignupPage - /signup ("Get started"). Front-end only: validates, then routes
+ * to the dashboard preview. No backend, nothing is submitted. Shares the auth
+ * styles defined in AuthShell's global block (loaded on both auth routes).
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import AuthShell from "../AuthShell.astro";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const g = s.signup;
+const dashHref = href(lang, "dashboard");
+const loginHref = href(lang, "login");
+---
+<AuthShell lang={lang} active="signup" meta={g.meta}>
+  <h1 class="bl-auth-title">{g.title}</h1>
+  <p class="bl-auth-lead">{g.lead}</p>
+
+  <form id="bl-signup-form" novalidate class="bl-auth-form">
+    <label class="bl-auth-label" for="bl-su-name">{g.name}</label>
+    <input id="bl-su-name" name="name" class="bl-auth-input" required autocomplete="name" />
+
+    <label class="bl-auth-label" for="bl-su-email">{g.email}</label>
+    <input id="bl-su-email" name="email" type="email" class="bl-auth-input" required autocomplete="email" />
+
+    <label class="bl-auth-label" for="bl-su-pass">{g.password}</label>
+    <input id="bl-su-pass" name="password" type="password" class="bl-auth-input" required autocomplete="new-password" />
+
+    <p class="bl-auth-err" data-err hidden></p>
+    <button type="submit" class="btn bl-auth-submit">{g.submit}</button>
+    <p class="bl-auth-terms">{g.terms}</p>
+  </form>
+
+  <p class="bl-auth-switch">{g.haveAccount} <a href={loginHref}>{g.switch}</a></p>
+  <p class="bl-auth-note">{g.demoNote}</p>
+</AuthShell>
+
+<script is:inline define:vars={{ dashHref, requiredMsg: g.required, emailMsg: g.emailInvalid }}>
+  (function () {
+    var form = document.getElementById("bl-signup-form");
+    if (!form) return;
+    var err = form.querySelector("[data-err]");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var fields = form.querySelectorAll("[required]");
+      for (var i = 0; i < fields.length; i++) {
+        var f = fields[i];
+        if (!String(f.value).trim()) { err.textContent = requiredMsg; err.hidden = false; f.focus(); return; }
+        if (f.type === "email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value)) { err.textContent = emailMsg; err.hidden = false; f.focus(); return; }
+      }
+      err.hidden = true;
+      window.location.href = dashHref;
+    });
+  })();
+</script>
+
+<style>
+  .bl-auth-terms { font-size: 11.5px; color: var(--ink-3); margin-top: 12px; line-height: 1.5; text-align: center; }
+</style>

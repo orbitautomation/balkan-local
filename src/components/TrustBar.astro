@@ -1,0 +1,36 @@
+---
+import { type Locale, t } from "../i18n/ui";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+---
+<section class="wrap" style="padding-block:56px;border-top:1px solid var(--rule)">
+  <p class="eyebrow reveal">{s.trust.kicker}</p>
+  <h2 class="section-title reveal" style="margin-top:10px">{s.trust.title}</h2>
+  <p class="lead reveal" style="margin-top:8px">{s.trust.lead}</p>
+
+  <div class="grid reveal" style="grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px">
+    {s.trust.stats.map((st) => (
+      <div class="card" style="padding:22px">
+        <div class="font-display" style="font-size:30px;font-weight:800;color:var(--accent);letter-spacing:-0.02em">{st.n}</div>
+        <div style="font-size:13px;color:var(--ink-2);margin-top:4px">{st.l}</div>
+      </div>
+    ))}
+  </div>
+
+  <div class="grid reveal" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px">
+    {s.trust.points.map((p) => (
+      <div class="card" style="padding:22px">
+        <div style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--success-soft);color:var(--success);font-weight:800;margin-bottom:12px">&#10003;</div>
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:5px">{p.t}</h3>
+        <p style="font-size:13.5px;color:var(--ink-2)">{p.d}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  @media (max-width: 760px) {
+    section :global(.grid) { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+</style>

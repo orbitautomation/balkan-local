@@ -1,0 +1,30 @@
+---
+/**
+ * ExperiencesPage - /experiences. The category showcase + the halal layer
+ * (live prayer times + masjid locator) + app waitlist.
+ */
+import { type Locale, t, href } from "../../i18n/ui";
+import PageShell from "../PageShell.astro";
+import PageHero from "../PageHero.astro";
+import Categories from "../Categories.astro";
+import Halal from "../Halal.astro";
+import CTASection from "../CTASection.astro";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const x = s.experiences;
+---
+<PageShell lang={lang} active="experiences" meta={x.meta}>
+  <PageHero eyebrow={s.nav.experiences} title={x.hero.title} lead={x.hero.lead} />
+  <Categories lang={lang} />
+  <Halal lang={lang} />
+  <CTASection
+    title={s.how.cta.title}
+    body={s.how.cta.body}
+    ctaLabel={s.nav.business}
+    ctaHref={href(lang, "business")}
+    secondaryLabel={s.nav.property}
+    secondaryHref={href(lang, "property")}
+  />
+</PageShell>

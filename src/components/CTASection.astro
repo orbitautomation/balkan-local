@@ -1,0 +1,27 @@
+---
+/**
+ * CTASection - reusable conversion band for the bottom of pages. Prop-driven
+ * (localized copy passed in), so it stays decoupled from any one page.
+ */
+export interface Props {
+  title: string;
+  body?: string;
+  ctaLabel: string;
+  ctaHref: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}
+const { title, body, ctaLabel, ctaHref, secondaryLabel, secondaryHref } = Astro.props;
+---
+<section class="wrap" style="padding-block:56px">
+  <div class="card reveal" style="padding:44px 32px;text-align:center;background:var(--hero-grad)">
+    <h2 class="section-title">{title}</h2>
+    {body && <p class="lead" style="margin:12px auto 0;text-align:center">{body}</p>}
+    <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a href={ctaHref} class="btn">{ctaLabel}</a>
+      {secondaryLabel && secondaryHref && (
+        <a href={secondaryHref} class="btn btn-ghost">{secondaryLabel}</a>
+      )}
+    </div>
+  </div>
+</section>

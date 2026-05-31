@@ -1,0 +1,230 @@
+---
+/**
+ * TripDashboard - an interactive (static, no backend) mockup of the traveler
+ * dashboard: a tabbed view (Itinerary / Bookings / Inbox / Payment) on a
+ * concrete Sarajevo sample trip. Sells the "whole trip in one place" promise.
+ * Tab switching is a tiny vanilla script with full tablist a11y + arrow keys.
+ * Used on Home and /how-it-works.
+ */
+import { type Locale, t } from "../i18n/ui";
+import VerifiedBadge from "./VerifiedBadge.astro";
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const td = s.tripDash;
+const tabs: { key: string; label: string }[] = [
+  { key: "itinerary", label: td.tabs.itinerary },
+  { key: "bookings", label: td.tabs.bookings },
+  { key: "inbox", label: td.tabs.inbox },
+  { key: "payment", label: td.tabs.payment },
+];
+---
+<section id="trip-dashboard" class="wrap" style="padding-block:56px;border-top:1px solid var(--rule)">
+  <p class="eyebrow reveal">{td.kicker}</p>
+  <h2 class="section-title reveal" style="margin-top:10px">{td.title}</h2>
+  <p class="lead reveal" style="margin-top:8px">{td.lead}</p>
+
+  <div class="bl-td card reveal" style="margin-top:24px;overflow:hidden">
+    <!-- App frame header -->
+    <div class="bl-td-bar">
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e0686b"></span>
+        <span style="width:9px;height:9px;border-radius:50%;background:#e0b24b"></span>
+        <span style="width:9px;height:9px;border-radius:50%;background:#5bb98c"></span>
+      </div>
+      <span style="font-size:13px;font-weight:700;color:var(--ink-2)">{td.sampleTrip}</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bl-td-tabs" role="tablist" aria-label={td.title}>
+      {tabs.map((tab, i) => (
+        <button
+          id={`bl-td-tab-${tab.key}`}
+          class="bl-td-tab"
+          role="tab"
+          type="button"
+          aria-selected={i === 0 ? "true" : "false"}
+          aria-controls={`bl-td-panel-${tab.key}`}
+          tabindex={i === 0 ? 0 : -1}
+          data-td-tab={tab.key}
+        >{tab.label}</button>
+      ))}
+    </div>
+
+    <!-- Panels -->
+    <div class="bl-td-body">
+      <!-- Itinerary -->
+      <div id="bl-td-panel-itinerary" role="tabpanel" aria-labelledby="bl-td-tab-itinerary" tabindex="0" data-td-panel="itinerary">
+        <ol class="bl-timeline">
+          {td.itinerary.map((it) => (
+            <li class="bl-tl-item">
+              <span class="bl-tl-dot" aria-hidden="true"></span>
+              <div class="bl-tl-head">
+                <span class="bl-tl-day">{it.day}</span>
+                <span class="bl-tl-time">{it.time}</span>
+                <span class="bl-tl-tag">{it.tag}</span>
+              </div>
+              <div class="bl-tl-title">{it.title}</div>
+              <div class="bl-tl-meta">{it.meta}</div>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <!-- Bookings -->
+      <div id="bl-td-panel-bookings" role="tabpanel" aria-labelledby="bl-td-tab-bookings" tabindex="0" data-td-panel="bookings" hidden>
+        <div class="bl-bk-grid">
+          {td.bookings.map((b) => (
+            <div class="bl-bk">
+              <div class="bl-bk-row">
+                <span class="bl-bk-title">{b.title}</span>
+                <span class={`bl-bk-status ${b.confirmed ? "ok" : "wait"}`}>{b.status}</span>
+              </div>
+              <div class="bl-bk-meta">{b.meta}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Inbox -->
+      <div id="bl-td-panel-inbox" role="tabpanel" aria-labelledby="bl-td-tab-inbox" tabindex="0" data-td-panel="inbox" hidden>
+        <ul class="bl-inbox">
+          {td.inbox.map((m) => (
+            <li class="bl-msg">
+              <div class="bl-msg-avatar" aria-hidden="true">{m.from.slice(0, 1)}</div>
+              <div style="min-width:0;flex:1">
+                <div class="bl-msg-head">
+                  <span class="bl-msg-from">{m.from}</span>
+                  <span class="bl-msg-time">{m.time}</span>
+                </div>
+                <div class="bl-msg-preview">{m.preview}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Payment -->
+      <div id="bl-td-panel-payment" role="tabpanel" aria-labelledby="bl-td-tab-payment" tabindex="0" data-td-panel="payment" hidden>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:12px">{td.payment.title}</h3>
+        <ul class="bl-pay">
+          {td.payment.rows.map((r) => (
+            <li class="bl-pay-row">
+              <span class="bl-pay-label">{r.label}</span>
+              <span class="bl-pay-amount">{r.amount}</span>
+            </li>
+          ))}
+          <li class="bl-pay-row bl-pay-total">
+            <span class="bl-pay-label">{td.payment.totalLabel}</span>
+            <span class="bl-pay-amount">{td.payment.total}</span>
+          </li>
+        </ul>
+        <div style="margin-top:14px"><VerifiedBadge label={td.payment.note} size="sm" /></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  #trip-dashboard :global(.bl-td) { background: var(--bg-3); border: 1px solid var(--rule); }
+  #trip-dashboard :global(.bl-td-bar) {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; border-bottom: 1px solid var(--rule); background: var(--surface-2);
+  }
+  #trip-dashboard :global(.bl-td-tabs) {
+    display: flex; gap: 4px; padding: 10px 12px 0;
+    border-bottom: 1px solid var(--rule); overflow-x: auto;
+  }
+  #trip-dashboard :global(.bl-td-tab) {
+    font: inherit; font-size: 13.5px; font-weight: 600; white-space: nowrap;
+    padding: 10px 14px; border: 0; background: transparent; color: var(--ink-3);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  #trip-dashboard :global(.bl-td-tab:hover) { color: var(--ink-2); }
+  #trip-dashboard :global(.bl-td-tab[aria-selected="true"]) { color: var(--ink); border-bottom-color: var(--accent); }
+  #trip-dashboard :global(.bl-td-body) { padding: 20px 18px; }
+
+  /* Itinerary timeline (logical props so it mirrors in RTL) */
+  #trip-dashboard :global(.bl-timeline) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+  #trip-dashboard :global(.bl-tl-item) { position: relative; padding-inline-start: 22px; border-inline-start: 2px solid var(--rule); }
+  #trip-dashboard :global(.bl-tl-dot) {
+    position: absolute; inset-inline-start: -7px; top: 2px;
+    width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg-3);
+  }
+  #trip-dashboard :global(.bl-tl-head) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  #trip-dashboard :global(.bl-tl-day) { font-size: 11px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+  #trip-dashboard :global(.bl-tl-time) { font-size: 12px; color: var(--ink-3); }
+  #trip-dashboard :global(.bl-tl-tag) { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--ink-2); }
+  #trip-dashboard :global(.bl-tl-title) { font-size: 14.5px; font-weight: 700; margin-top: 5px; }
+  #trip-dashboard :global(.bl-tl-meta) { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+
+  /* Bookings */
+  #trip-dashboard :global(.bl-bk-grid) { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  #trip-dashboard :global(.bl-bk) { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-sm); padding: 14px; }
+  #trip-dashboard :global(.bl-bk-row) { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  #trip-dashboard :global(.bl-bk-title) { font-size: 14px; font-weight: 700; }
+  #trip-dashboard :global(.bl-bk-status) { font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: var(--r-pill); white-space: nowrap; }
+  #trip-dashboard :global(.bl-bk-status.ok) { background: var(--success-soft); color: var(--success); }
+  #trip-dashboard :global(.bl-bk-status.wait) { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent-2); }
+  #trip-dashboard :global(.bl-bk-meta) { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+
+  /* Inbox */
+  #trip-dashboard :global(.bl-inbox) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  #trip-dashboard :global(.bl-msg) { display: flex; gap: 12px; padding: 12px; border-radius: var(--r-sm); }
+  #trip-dashboard :global(.bl-msg:hover) { background: var(--surface); }
+  #trip-dashboard :global(.bl-msg-avatar) {
+    flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--accent-glow); color: var(--accent-2); font-weight: 800; font-size: 16px;
+  }
+  #trip-dashboard :global(.bl-msg-head) { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  #trip-dashboard :global(.bl-msg-from) { font-size: 13.5px; font-weight: 700; }
+  #trip-dashboard :global(.bl-msg-time) { font-size: 11.5px; color: var(--ink-3); flex: none; }
+  #trip-dashboard :global(.bl-msg-preview) { font-size: 13px; color: var(--ink-2); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Payment */
+  #trip-dashboard :global(.bl-pay) { list-style: none; margin: 0; padding: 0; max-width: 460px; }
+  #trip-dashboard :global(.bl-pay-row) { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px dashed var(--rule); }
+  #trip-dashboard :global(.bl-pay-label) { font-size: 13.5px; color: var(--ink-2); }
+  #trip-dashboard :global(.bl-pay-amount) { font-size: 13.5px; font-weight: 700; }
+  #trip-dashboard :global(.bl-pay-total) { border-bottom: 0; margin-top: 4px; }
+  #trip-dashboard :global(.bl-pay-total .bl-pay-label) { font-weight: 800; color: var(--ink); font-size: 15px; }
+  #trip-dashboard :global(.bl-pay-total .bl-pay-amount) { font-weight: 800; color: var(--accent); font-size: 18px; }
+
+  @media (max-width: 560px) { #trip-dashboard :global(.bl-bk-grid) { grid-template-columns: 1fr !important; } }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("trip-dashboard");
+    if (!root) return;
+    var tabs = Array.prototype.slice.call(root.querySelectorAll("[data-td-tab]"));
+    var panels = Array.prototype.slice.call(root.querySelectorAll("[data-td-panel]"));
+    function select(key, focus) {
+      tabs.forEach(function (t) {
+        var on = t.getAttribute("data-td-tab") === key;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.tabIndex = on ? 0 : -1;
+        if (on && focus) t.focus();
+      });
+      panels.forEach(function (p) {
+        p.hidden = p.getAttribute("data-td-panel") !== key;
+      });
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { select(t.getAttribute("data-td-tab")); });
+      t.addEventListener("keydown", function (e) {
+        var rtl = document.documentElement.dir === "rtl";
+        var fwd = rtl ? "ArrowLeft" : "ArrowRight";
+        var back = rtl ? "ArrowRight" : "ArrowLeft";
+        var next = i;
+        if (e.key === fwd) next = (i + 1) % tabs.length;
+        else if (e.key === back) next = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === "Home") next = 0;
+        else if (e.key === "End") next = tabs.length - 1;
+        else return;
+        e.preventDefault();
+        select(tabs[next].getAttribute("data-td-tab"), true);
+      });
+    });
+  })();
+</script>
