@@ -1,0 +1,116 @@
+---
+/**
+ * PhotoSlot - a themed photo placeholder that becomes a real <img> the moment a
+ * `src` is provided. During the placeholder phase it shows a tokenised gradient
+ * box with a monoline image glyph and an optional caption, so the page reads as
+ * premium without shipping any unlicensed photography.
+ *
+ * Swapping in a real image later is a one-line change: add `src="/img/..."`
+ * (and `alt`) to the existing <PhotoSlot> call. The `hero` frame wraps both the
+ * placeholder and the future <img>, so it survives the swap.
+ *
+ * `variant` gives role-driven treatments (uniform within a section, distinct
+ * between sections) so the page looks intentional, not random:
+ *   plain      - default, neutral gradient (map detail card)
+ *   hero       - lead image: gold frame + uppercase corner label
+ *   tone-warm  - gold-leaning wash (headline-sights grid)
+ *   tone-cool  - teal-leaning wash (local-gems grid)
+ *
+ * Captions/alt come from the caller (i18n), so they translate.
+ */
+export type PhotoVariant = "plain" | "hero" | "tone-warm" | "tone-cool";
+export interface Props {
+  ratio?: string; // aspect-ratio, e.g. "16/9" (default), "4/3", "1/1"
+  caption?: string; // subtle label shown on the placeholder + used as <img> alt fallback
+  src?: string; // FUTURE real image path; when set, renders <img>
+  alt?: string; // <img> alt text (falls back to caption)
+  eager?: boolean; // hero images can opt out of lazy loading
+  rounded?: boolean; // round the corners (default true)
+  variant?: PhotoVariant;
+}
+const { ratio = "16/9", caption, src, alt, eager = false, rounded = true, variant = "plain" } = Astro.props;
+const radius = rounded ? "var(--r-lg)" : "0";
+const isHero = variant === "hero";
+---
+<div class:list={["bl-photo-wrap", isHero && "bl-frame-hero"]} style={`border-radius:${radius}`}>
+  {src ? (
+    <img
+      src={src}
+      alt={alt ?? caption ?? ""}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      class="bl-photo"
+      style={`aspect-ratio:${ratio};border-radius:${radius}`}
+    />
+  ) : (
+    <div class:list={["bl-photo", "bl-photo-ph", `bl-v-${variant}`]} role="img" aria-label={caption ?? "Photo placeholder"} style={`aspect-ratio:${ratio};border-radius:${radius}`}>
+      <svg class="bl-photo-glyph" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+        <circle cx="8.5" cy="9.5" r="1.5"></circle>
+        <path d="M21 16l-5-5L5 20"></path>
+      </svg>
+      {caption && <span class:list={["bl-photo-cap", isHero && "bl-photo-cap-hero"]}>{caption}</span>}
+    </div>
+  )}
+</div>
+
+<style>
+  .bl-photo-wrap { display: block; }
+  .bl-photo { display: block; width: 100%; height: auto; object-fit: cover; overflow: hidden; }
+  .bl-photo-ph {
+    position: relative;
+    display: grid;
+    place-items: center;
+    gap: 10px;
+    border: 1px solid var(--rule);
+    background:
+      radial-gradient(120% 120% at 15% 12%, var(--accent-glow), transparent 60%),
+      linear-gradient(150deg, var(--surface-2), var(--surface));
+    color: var(--ink-3);
+  }
+  .bl-photo-glyph { opacity: 0.65; }
+  .bl-photo-cap {
+    position: absolute;
+    inset-inline-start: 14px;
+    inset-block-end: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-3);
+    text-align: start;
+  }
+
+  /* Warm (gold) wash - headline sights */
+  .bl-v-tone-warm {
+    background:
+      radial-gradient(130% 130% at 18% 10%, var(--accent-glow), transparent 58%),
+      linear-gradient(150deg, color-mix(in srgb, var(--accent) 12%, var(--surface-2)), var(--surface));
+  }
+  /* Cool (teal) wash - local gems */
+  .bl-v-tone-cool {
+    background:
+      radial-gradient(130% 130% at 82% 12%, var(--success-soft), transparent 60%),
+      linear-gradient(150deg, color-mix(in srgb, var(--success) 10%, var(--surface-2)), var(--surface));
+  }
+
+  /* Hero: gold frame + cream/indigo mat, distinct lead-image treatment */
+  .bl-frame-hero {
+    padding: 8px;
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--rule));
+    background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 14%, var(--surface)), var(--surface));
+    box-shadow: var(--shadow-card);
+  }
+  .bl-v-hero {
+    background:
+      radial-gradient(120% 120% at 20% 14%, var(--accent-glow), transparent 55%),
+      linear-gradient(150deg, var(--bg-2), var(--surface));
+  }
+  .bl-photo-cap-hero {
+    inset-block-end: auto;
+    inset-block-start: 14px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+  }
+</style>

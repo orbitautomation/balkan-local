@@ -9,7 +9,8 @@ export interface Props { lang: Locale }
 const { lang } = Astro.props;
 const s = t(lang);
 const c = s.countries;
-const exploreHref = href(lang, "experiences");
+// Bosnia (the only live country) routes to its dedicated destination page.
+const exploreHref = href(lang, "bosnia");
 ---
 <section id="destinations-picker" class="wrap" style="padding-block:48px;border-top:1px solid var(--rule)">
   <p class="eyebrow reveal">{c.kicker}</p>

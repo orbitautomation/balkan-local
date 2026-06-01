@@ -21,6 +21,7 @@ import * as how from "./strings/how";
 import * as business from "./strings/business";
 import * as property from "./strings/property";
 import * as destinations from "./strings/destinations";
+import * as bosnia from "./strings/bosnia";
 import * as legal from "./strings/legal";
 import * as auth from "./strings/auth";
 
@@ -62,6 +63,7 @@ export const ROUTES = {
   howItWorks: "how-it-works",
   trust: "trust",
   destinations: "destinations",
+  bosnia: "bosnia",
   experiences: "experiences",
   business: "for-business",
   property: "property",
@@ -94,6 +96,7 @@ const en = {
   ...business.en,
   ...property.en,
   ...destinations.en,
+  ...bosnia.en,
   ...legal.en,
   ...auth.en,
 };
@@ -108,6 +111,7 @@ const de: typeof en = {
   ...business.de,
   ...property.de,
   ...destinations.de,
+  ...bosnia.de,
   ...legal.de,
   ...auth.de,
 };
@@ -122,6 +126,7 @@ const ar: typeof en = {
   ...business.ar,
   ...property.ar,
   ...destinations.ar,
+  ...bosnia.ar,
   ...legal.ar,
   ...auth.ar,
 };

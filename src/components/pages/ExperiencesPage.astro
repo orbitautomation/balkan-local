@@ -6,6 +6,7 @@
 import { type Locale, t, href } from "../../i18n/ui";
 import PageShell from "../PageShell.astro";
 import PageHero from "../PageHero.astro";
+import CountrySelector from "../CountrySelector.astro";
 import Categories from "../Categories.astro";
 import Halal from "../Halal.astro";
 import CTASection from "../CTASection.astro";
@@ -17,6 +18,7 @@ const x = s.experiences;
 ---
 <PageShell lang={lang} active="experiences" meta={x.meta}>
   <PageHero eyebrow={s.nav.experiences} title={x.hero.title} lead={x.hero.lead} />
+  <CountrySelector lang={lang} />
   <Categories lang={lang} />
   <Halal lang={lang} />
   <CTASection

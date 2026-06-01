@@ -1,0 +1,320 @@
+---
+/**
+ * BosniaMap - the interactive heart of the /bosnia page.
+ *
+ * A Leaflet map (OSM tiles, no key) of 25+ first-party pins across five
+ * categories. A filter bar toggles categories on and off; clicking a pin fills
+ * a detail card below the map and scrolls/focuses it. Reuses the proven recipe
+ * from Halal.astro (Leaflet 1.9.4 via unpkg + SRI, `ready()` poller, divIcon
+ * teardrop markers, the `esc()` escaper for bindPopup).
+ *
+ * Data join: pin name/coords/category come from `src/data/bosnia.ts`; the
+ * translatable blurb is looked up from i18n by pin id and merged here. All of it
+ * reaches the vanilla script via `define:vars`, so there is no hardcoded copy.
+ */
+import { type Locale, t } from "../i18n/ui";
+import PhotoSlot from "./PhotoSlot.astro";
+import { BOSNIA_PLACES, BOSNIA_CENTER, BOSNIA_ZOOM, type BosniaCategory } from "../data/bosnia";
+
+export interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = t(lang);
+const m = s.bosnia.map;
+
+// Order the filter chips and give each category a teardrop colour.
+const cats: { key: BosniaCategory; label: string; color: string }[] = [
+  { key: "cities", label: m.categories.cities, color: "#C8A24B" },
+  { key: "nature", label: m.categories.nature, color: "#14b8a1" },
+  { key: "food", label: m.categories.food, color: "#e0875b" },
+  { key: "religious", label: m.categories.religious, color: "#9d84ff" },
+  { key: "hidden", label: m.categories.hidden, color: "#e0be6a" },
+];
+
+// Join first-party pin data with the translatable blurb (by id).
+const pins = BOSNIA_PLACES.map((p) => ({
+  id: p.id,
+  name: p.name,
+  lat: p.lat,
+  lng: p.lng,
+  category: p.category,
+  area: p.area,
+  blurb: m.blurbs[p.id as keyof typeof m.blurbs] ?? "",
+}));
+
+// Copy the script needs (kept out of the script body to avoid hardcoded English).
+const copy = {
+  areaLabel: m.areaLabel,
+  catLabels: {
+    cities: m.categories.cities,
+    nature: m.categories.nature,
+    food: m.categories.food,
+    religious: m.categories.religious,
+    hidden: m.categories.hidden,
+  },
+};
+---
+<section id="bosnia-map" class="wrap" style="padding-block:44px 64px">
+  <p class="eyebrow reveal">{m.kicker}</p>
+  <h2 class="section-title reveal" style="margin-top:10px">{m.title}</h2>
+  <p class="lead reveal" style="margin-top:10px">{m.lead}</p>
+
+  <!-- Filter bar -->
+  <div class="bl-mapfilters reveal" role="group" aria-label={m.filterBarLabel}>
+    <button type="button" class="bl-filter" data-cat="all" aria-pressed="true">{m.filterAll}</button>
+    {cats.map((c) => (
+      <button type="button" class="bl-filter" data-cat={c.key} aria-pressed="true">
+        <span class="bl-filter-dot" style={`background:${c.color}`} aria-hidden="true"></span>
+        {c.label}
+      </button>
+    ))}
+  </div>
+
+  <!-- Map + detail card -->
+  <div class="bl-maprow reveal">
+    <div id="bl-bosnia-map" role="region" aria-label={m.mapTitle}></div>
+
+    <aside id="bl-bosnia-detail" class="card" role="region" aria-live="polite" aria-label={m.detailRegionLabel} tabindex="-1">
+      <!-- Prompt state (shown until a pin is clicked) -->
+      <div data-detail-prompt class="bl-detail-prompt">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+        <p>{m.detailPrompt}</p>
+      </div>
+
+      <!-- Filled state (revealed by the script) -->
+      <div data-detail-body hidden>
+        <span data-detail-tag class="bl-detail-tag"></span>
+        <h3 data-detail-name class="bl-detail-name"></h3>
+        <p data-detail-area class="bl-detail-area"></p>
+        <p data-detail-blurb class="bl-detail-blurb"></p>
+        <div class="bl-detail-photo">
+          <PhotoSlot ratio="4/3" caption={m.detailPhotoCaption} />
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <p class="reveal bl-map-note">{m.note}</p>
+</section>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script is:inline define:vars={{ pins, center: BOSNIA_CENTER, zoom: BOSNIA_ZOOM, cats, copy }}>
+  (function () {
+    var mapEl = document.getElementById("bl-bosnia-map");
+    var detailEl = document.getElementById("bl-bosnia-detail");
+    if (!mapEl) return;
+
+    var catColor = {};
+    cats.forEach(function (c) { catColor[c.key] = c.color; });
+
+    // Escape untrusted text before Leaflet bindPopup (renders HTML). Pin data is
+    // first-party, but we keep the same discipline as the masjid map.
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function ready(cb) {
+      if (window.L) return cb();
+      var tries = 0;
+      var iv = setInterval(function () {
+        if (window.L) { clearInterval(iv); cb(); }
+        else if (++tries > 60) { clearInterval(iv); }
+      }, 100);
+    }
+
+    function teardrop(color) {
+      return window.L.divIcon({
+        className: "",
+        html: '<div style="width:16px;height:16px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:' + color + ';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>',
+        iconSize: [16, 16], iconAnchor: [8, 16],
+      });
+    }
+
+    // ---------- Detail card ----------
+    var promptEl = detailEl.querySelector("[data-detail-prompt]");
+    var bodyEl = detailEl.querySelector("[data-detail-body]");
+    var tagEl = detailEl.querySelector("[data-detail-tag]");
+    var nameEl = detailEl.querySelector("[data-detail-name]");
+    var areaEl = detailEl.querySelector("[data-detail-area]");
+    var blurbEl = detailEl.querySelector("[data-detail-blurb]");
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function showDetail(p) {
+      // textContent only -> no HTML injection surface for first-party blurbs.
+      tagEl.textContent = copy.catLabels[p.category] || "";
+      tagEl.style.background = (catColor[p.category] || "#C8A24B");
+      nameEl.textContent = p.name;
+      areaEl.textContent = copy.areaLabel + ": " + p.area;
+      blurbEl.textContent = p.blurb;
+      if (promptEl) promptEl.hidden = true;
+      if (bodyEl) bodyEl.hidden = false;
+      detailEl.focus();
+      detailEl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest" });
+    }
+
+    // ---------- Map ----------
+    ready(function () {
+      var map = window.L.map(mapEl, { scrollWheelZoom: false, attributionControl: true })
+        .setView([center.lat, center.lng], zoom);
+      window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19, attribution: "&copy; OpenStreetMap",
+      }).addTo(map);
+
+      var layer = window.L.layerGroup().addTo(map);
+
+      // Build a marker per pin once; keep category alongside for filtering.
+      var markers = pins.map(function (p) {
+        var mk = window.L.marker([p.lat, p.lng], { icon: teardrop(catColor[p.category] || "#C8A24B") });
+        mk.bindPopup(esc(p.name));
+        mk.on("click", function () { showDetail(p); });
+        return { cat: p.category, marker: mk };
+      });
+
+      // Active category set starts with everything on.
+      var active = {};
+      cats.forEach(function (c) { active[c.key] = true; });
+
+      function render() {
+        layer.clearLayers();
+        markers.forEach(function (rec) {
+          if (active[rec.cat]) rec.marker.addTo(layer);
+        });
+      }
+      render();
+
+      // ---------- Filters ----------
+      var buttons = Array.prototype.slice.call(document.querySelectorAll(".bl-filter"));
+      function syncButtons() {
+        var allOn = cats.every(function (c) { return active[c.key]; });
+        buttons.forEach(function (btn) {
+          var cat = btn.getAttribute("data-cat");
+          if (cat === "all") btn.setAttribute("aria-pressed", allOn ? "true" : "false");
+          else btn.setAttribute("aria-pressed", active[cat] ? "true" : "false");
+        });
+      }
+      // `active` already holds exactly the category keys, so iterate it directly
+      // (avoids re-referencing the `cats` define:vars binding inside this handler).
+      var catKeys = Object.keys(active);
+      buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var cat = btn.getAttribute("data-cat");
+          if (cat === "all") {
+            catKeys.forEach(function (k) { active[k] = true; });
+          } else {
+            active[cat] = !active[cat];
+            // Never allow an all-off state; re-enable if the last one was turned off.
+            var anyOn = catKeys.some(function (k) { return active[k]; });
+            if (!anyOn) active[cat] = true;
+          }
+          syncButtons();
+          render();
+        });
+      });
+      syncButtons();
+    });
+  })();
+</script>
+
+<style>
+  /* Filter bar */
+  #bosnia-map :global(.bl-mapfilters) { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  #bosnia-map :global(.bl-filter) {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: 13px; font-weight: 600;
+    padding: 9px 14px; min-height: var(--tap-min);
+    border-radius: var(--r-pill); border: 1px solid var(--rule);
+    background: var(--surface); color: var(--ink-2); cursor: pointer;
+    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  }
+  #bosnia-map :global(.bl-filter:hover) { color: var(--ink); }
+  #bosnia-map :global(.bl-filter[aria-pressed="true"]) { background: var(--surface-2); color: var(--ink); border-color: var(--rule-hi); }
+  #bosnia-map :global(.bl-filter[aria-pressed="false"]) { opacity: 0.5; }
+  #bosnia-map :global(.bl-filter-dot) { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+  /* Map + detail layout */
+  #bosnia-map :global(.bl-maprow) {
+    display: grid; grid-template-columns: 1.7fr 1fr; gap: 18px; margin-top: 22px; align-items: stretch;
+  }
+  #bosnia-map :global(#bl-bosnia-map) {
+    height: 460px; border-radius: var(--r-lg); overflow: hidden;
+    background: var(--surface-2); border: 1px solid var(--rule);
+  }
+  #bosnia-map :global(#bl-bosnia-detail) { padding: 22px; display: flex; flex-direction: column; }
+
+  #bosnia-map :global(.bl-detail-prompt) {
+    margin: auto; text-align: center; color: var(--ink-3); display: grid; place-items: center; gap: 12px; max-width: 26ch;
+  }
+  #bosnia-map :global(.bl-detail-prompt p) { font-size: 14px; line-height: 1.6; }
+
+  #bosnia-map :global(.bl-detail-tag) {
+    display: inline-block; align-self: flex-start;
+    font-size: 11px; font-weight: 800; color: var(--accent-ink);
+    padding: 4px 11px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  #bosnia-map :global(.bl-detail-name) { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; margin-top: 14px; }
+  #bosnia-map :global(.bl-detail-area) { font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
+  #bosnia-map :global(.bl-detail-blurb) { font-size: 14px; color: var(--ink-2); line-height: 1.65; margin-top: 12px; }
+  #bosnia-map :global(.bl-detail-photo) { margin-top: 16px; }
+
+  #bosnia-map :global(.bl-map-note) { font-size: 13px; color: var(--ink-3); margin-top: 16px; line-height: 1.6; max-width: 70ch; }
+
+  @media (max-width: 820px) {
+    #bosnia-map :global(.bl-maprow) { grid-template-columns: 1fr; }
+    #bosnia-map :global(#bl-bosnia-map) { height: 360px; }
+  }
+</style>
+
+<!--
+  Premium, theme-aware map chrome. Keyed on the unique #bosnia-map ID so it is
+  effectively scoped (no other page has that id) while still reaching Leaflet's
+  own global classes + the :root[data-theme] gate. Tiles are free OSM raster
+  (keyless, commercial-OK with attribution); the dark look is a CSS filter, not a
+  paid dark-tile provider, so there is zero licensing/key cost. The filter hits
+  .leaflet-tile only, so markers and popups keep their real colours.
+-->
+<style is:global>
+  /* Dark theme: invert + hue-rotate(180) darkens the map while keeping water blue
+     and greens roughly natural. A faint indigo wash ties it to the palette. */
+  :root[data-theme="dark"] #bl-bosnia-map .leaflet-tile {
+    filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9) saturate(0.85);
+  }
+  :root[data-theme="dark"] #bl-bosnia-map { background: #15123a; }
+  :root[data-theme="dark"] #bl-bosnia-map::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 0%, rgba(30, 27, 75, 0.18), transparent 60%);
+    z-index: 400; border-radius: var(--r-lg);
+  }
+  #bl-bosnia-map { position: relative; }
+
+  /* Zoom control */
+  #bl-bosnia-map .leaflet-control-zoom { border: none; box-shadow: var(--shadow-card); border-radius: var(--r-sm); overflow: hidden; }
+  #bl-bosnia-map .leaflet-control-zoom a {
+    background: var(--surface); color: var(--ink); border-bottom: 1px solid var(--rule);
+    width: 34px; height: 34px; line-height: 34px; font-size: 18px;
+  }
+  #bl-bosnia-map .leaflet-control-zoom a:hover { background: var(--accent); color: var(--accent-ink); }
+  #bl-bosnia-map .leaflet-bar a:last-child { border-bottom: none; }
+
+  /* Attribution (kept visible: it is the licensing requirement) */
+  #bl-bosnia-map .leaflet-control-attribution {
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    color: var(--ink-3); font-size: 10.5px; border-radius: var(--r-sm) 0 0 0; backdrop-filter: blur(6px);
+  }
+  #bl-bosnia-map .leaflet-control-attribution a { color: var(--accent-2); }
+
+  /* Popups */
+  #bl-bosnia-map .leaflet-popup-content-wrapper {
+    background: var(--surface-2); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--r-md); box-shadow: var(--shadow-pop);
+  }
+  #bl-bosnia-map .leaflet-popup-content { font-family: var(--font-text); font-size: 13px; font-weight: 600; margin: 10px 14px; }
+  #bl-bosnia-map .leaflet-popup-tip { background: var(--surface-2); border: 1px solid var(--rule); }
+  #bl-bosnia-map .leaflet-popup-close-button { color: var(--ink-3); }
+  #bl-bosnia-map .leaflet-popup-close-button:hover { color: var(--ink); }
+
+  /* Marker polish: soft shadow + a gentle lift on hover (CSS only, no script change) */
+  #bl-bosnia-map .leaflet-marker-icon { filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45)); transition: transform var(--dur-fast) var(--ease); }
+  #bl-bosnia-map .leaflet-marker-icon:hover { transform: scale(1.18); z-index: 1000 !important; }
+</style>
